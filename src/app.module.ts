@@ -8,16 +8,30 @@ import { UserModule } from './user/user.module';
 import { MessageService } from './message/message.service';
 import { PrismaService } from './prisma.service';
 import { RoomService } from './room/room.service';
+import { MessageResolver } from './message/message.resolver';
+import { MessageModule } from './message/message.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      subscriptions: {
+        'graphql-ws': true,
+      },
     }),
     UserModule,
+    MessageModule,
+    RoomModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MessageService, PrismaService, RoomService],
+  providers: [
+    AppService,
+    MessageService,
+    PrismaService,
+    RoomService,
+    MessageResolver,
+  ],
 })
 export class AppModule {}

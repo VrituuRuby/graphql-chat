@@ -1,6 +1,4 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Room } from 'src/room/model/room.model';
-import { User } from 'src/user/models/user.model';
 
 @ObjectType()
 export class Message {
@@ -13,9 +11,9 @@ export class Message {
   @Field(() => Date)
   createdAt: Date;
 
-  @Field(() => User)
-  user: User;
+  @Field(() => Int)
+  user_id: number;
 
-  @Field(() => Room)
-  room: Room;
+  @Field(() => Int)
+  room_id: number;
 }

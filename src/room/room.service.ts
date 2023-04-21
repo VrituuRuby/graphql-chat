@@ -14,4 +14,8 @@ export class RoomService {
       where: { users: { some: { id: user_id } } },
     });
   }
+
+  async getRoom(id: number): Promise<Room> {
+    return await this.prismaService.room.findUnique({ where: { id } });
+  }
 }

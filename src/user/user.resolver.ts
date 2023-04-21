@@ -6,6 +6,7 @@ import {
   Query,
   ResolveField,
   Resolver,
+  Subscription,
 } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { User } from './models/user.model';
@@ -14,6 +15,9 @@ import { MessageService } from 'src/message/message.service';
 import { Message } from 'src/message/model/message.model';
 import { Room } from 'src/room/model/room.model';
 import { RoomService } from 'src/room/room.service';
+import { PubSub } from 'graphql-subscriptions';
+
+const pubSub = new PubSub();
 
 @Resolver((of) => User)
 export class UsersResolver {
@@ -46,5 +50,10 @@ export class UsersResolver {
   @ResolveField((returns) => [Room])
   async rooms(@Parent() user: User) {
     return await this.roomService.getAllRooms(user.id);
+  }
+
+  @Subscription((returns) => Message)
+  messageCreated() {
+    return pubSub.asyncIterator('messageCreated');
   }
 }
