@@ -12,15 +12,16 @@ import { UserService } from './user.service';
 import { User } from './models/user.model';
 import { CreateUserInput } from './models/inputs/createUserInput';
 import { MessageService } from 'src/message/message.service';
-import { Message } from 'src/message/model/message.model';
 import { Room } from 'src/room/model/room.model';
 import { RoomService } from 'src/room/room.service';
 import { PubSub } from 'graphql-subscriptions';
+import { Message } from 'src/message/model/message.model';
 
 const pubSub = new PubSub();
 
 @Resolver((of) => User)
 export class UsersResolver {
+  private pubSub: PubSub;
   constructor(
     private userService: UserService,
     private messageService: MessageService,
@@ -47,13 +48,15 @@ export class UsersResolver {
     });
   }
 
+  @Subscription((returns) => Message)
+  async createdMessage() {
+    console.log('tried to subscribe');
+    console.log(pubSub.asyncIterator('createdMessage'));
+    return pubSub.asyncIterator('createdMessage');
+  }
+
   @ResolveField((returns) => [Room])
   async rooms(@Parent() user: User) {
     return await this.roomService.getAllRooms(user.id);
-  }
-
-  @Subscription((returns) => Message)
-  messageCreated() {
-    return pubSub.asyncIterator('messageCreated');
   }
 }

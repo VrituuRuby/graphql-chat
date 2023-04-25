@@ -27,12 +27,15 @@
     "@nestjs/graphql": "^11.0.5",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "^4.13.0",
+    "apollo-server-express": "^3.12.0",
     "graphql": "^16.6.0",
     "graphql-subscriptions": "^2.0.0",
     "graphql-ws": "^5.12.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
-    "superagent": "^8.0.9"
+    "subscriptions-transport-ws": "^0.11.0",
+    "superagent": "^8.0.9",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

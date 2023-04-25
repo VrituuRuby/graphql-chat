@@ -15,6 +15,12 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Room {
+  id: Int!
+  name: String!
+  messages: [Message!]!
+}
+
 type Message {
   id: Int!
   text: String!
@@ -23,13 +29,8 @@ type Message {
   room_id: Int!
 }
 
-type Room {
-  id: Int!
-  name: String!
-  messages: [Message!]!
-}
-
 type Query {
+  messages(room_id: Int!): [Message!]!
   users: [User!]!
   user(id: Int!): User!
   room(id: Int!): Room!
@@ -53,5 +54,5 @@ input CreateUserInput {
 }
 
 type Subscription {
-  messageCreated: Message!
+  createdMessage: Message!
 }

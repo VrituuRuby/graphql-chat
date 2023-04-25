@@ -11,6 +11,7 @@ import { RoomService } from './room/room.service';
 import { MessageResolver } from './message/message.resolver';
 import { MessageModule } from './message/message.module';
 import { RoomModule } from './room/room.module';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
@@ -18,8 +19,12 @@ import { RoomModule } from './room/room.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
-        'graphql-ws': true,
+        'graphql-ws': {
+          path: '/graphql',
+        },
+        'subscriptions-transport-ws': true,
       },
+      installSubscriptionHandlers: true,
     }),
     UserModule,
     MessageModule,
