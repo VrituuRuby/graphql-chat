@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, HideField, Int, ObjectType } from '@nestjs/graphql';
 import { Room } from 'src/room/model/room.model';
 
 @ObjectType()
@@ -14,4 +14,7 @@ export class User {
 
   @Field(() => Date)
   createdAt: Date;
+
+  @HideField()
+  password: string;
 }

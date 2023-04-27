@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
+import { hash } from 'bcrypt';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -32,7 +33,10 @@ export class UserService {
       throw new BadRequestException('This email is already being used!');
 
     return await this.prismaService.user.create({
-      data,
+      data: {
+        ...data,
+        password: await hash(data.password, 8),
+      },
     });
   }
 }

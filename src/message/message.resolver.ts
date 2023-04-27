@@ -25,15 +25,12 @@ export class MessageResolver {
 
   @Subscription((returns) => Message)
   async createdMessage() {
-    console.log('tried to subscribe');
-    console.log(this.pubSub.asyncIterator('createdMessage'));
     return this.pubSub.asyncIterator('createdMessage');
   }
 
   @Mutation((returns) => Message)
   async createMessage(@Args('data') data: CreateMessageInput) {
     const message = await this.messageService.createMessage(data);
-    console.log(message);
     this.pubSub.publish('createdMessage', { createdMessage: message });
     return message;
   }

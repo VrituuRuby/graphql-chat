@@ -12,6 +12,7 @@ import { MessageResolver } from './message/message.resolver';
 import { MessageModule } from './message/message.module';
 import { RoomModule } from './room/room.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -22,13 +23,15 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
         'graphql-ws': {
           path: '/graphql',
         },
-        'subscriptions-transport-ws': true,
+        'subscriptions-transport-ws': {
+          path: '/graphql',
+        },
       },
-      installSubscriptionHandlers: true,
     }),
     UserModule,
     MessageModule,
     RoomModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

@@ -29,6 +29,11 @@ type Message {
   room_id: Int!
 }
 
+type AuthDTO {
+  user: User!
+  token: String!
+}
+
 type Query {
   messages(room_id: Int!): [Message!]!
   users: [User!]!
@@ -39,6 +44,7 @@ type Query {
 type Mutation {
   createMessage(data: CreateMessageInput!): Message!
   createUser(data: CreateUserInput!): User!
+  signIn(data: AuthInput!): AuthDTO!
 }
 
 input CreateMessageInput {
@@ -49,6 +55,11 @@ input CreateMessageInput {
 
 input CreateUserInput {
   name: String!
+  email: String!
+  password: String!
+}
+
+input AuthInput {
   email: String!
   password: String!
 }
