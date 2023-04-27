@@ -63,7 +63,7 @@ input CreateUserInput {
 
 input CreateRoomInput {
   name: String!
-  users_ids: [Float!]!
+  users_ids: [Float!]
 }
 
 input AuthInput {

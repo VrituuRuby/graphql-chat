@@ -6,6 +6,6 @@ export class CreateRoomInput {
   @Field(() => String)
   name: string;
 
-  @Field(() => [Number])
+  @Field(() => [Number], { nullable: true })
   users_ids?: number[];
 }
