@@ -14,7 +14,4 @@ export class User {
 
   @Field(() => Date)
   createdAt: Date;
-
-  @HideField()
-  password: string;
 }

@@ -44,7 +44,20 @@ describe('AuthService', () => {
     expect(authService).toBeDefined();
   });
 
-  it('should return a jwt-token if credentials are valid', async () => {});
+  it('should return a jwt-token if credentials are valid', async () => {
+    const mockToken = 'mocked-token';
+    const authInput = {
+      email: 'test@mail.com',
+      password: 'password',
+    };
+    (jwtService.signAsync as jest.Mock).mockResolvedValue(mockToken);
+    prismaMock.user.findUnique = jest.fn().mockResolvedValue(userMock[0]);
+
+    const payload = await authService.signIn(authInput);
+
+    expect(payload).toHaveProperty('token');
+    expect(payload.token).toBe(mockToken);
+  });
 
   it('should not allow access the token if credentials are invalid', async () => {
     const mockToken = 'mocked-token';
@@ -54,7 +67,6 @@ describe('AuthService', () => {
     };
     (jwtService.signAsync as jest.Mock).mockResolvedValue(mockToken);
     prismaMock.user.findUnique = jest.fn().mockResolvedValue(userMock[0]);
-
     expect(authService.signIn(authInput)).rejects.toThrow(
       UnauthorizedException,
     );

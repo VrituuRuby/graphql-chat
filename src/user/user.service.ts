@@ -18,6 +18,20 @@ export class UserService {
     return userExists;
   }
 
+  async findAllByRoomID(room_id: number) {
+    const room = await this.prismaService.room.findUnique({
+      where: { id: room_id },
+    });
+
+    if (!room) throw new NotFoundException('Room not found');
+
+    const users = await this.prismaService.user.findMany({
+      where: { rooms: { some: { id: room_id } } },
+    });
+
+    return users;
+  }
+
   async findAll(): Promise<User[]> {
     return await this.prismaService.user.findMany({
       include: { rooms: true, messages: true },

@@ -23,6 +23,7 @@ export class UsersResolver {
     private roomService: RoomService,
   ) {}
 
+  @UseGuards(AuthGuard)
   @Query((returns) => [User]!, { name: 'users' })
   async getAllUsers() {
     const users = await this.userService.findAll();
