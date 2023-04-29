@@ -13,6 +13,7 @@ import { MessageModule } from './message/message.module';
 import { RoomModule } from './room/room.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { AuthModule } from './auth/auth.module';
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuthModule } from './auth/auth.module';
     PrismaService,
     RoomService,
     MessageResolver,
+    UserService,
   ],
 })
 export class AppModule {}

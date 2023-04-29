@@ -8,13 +8,12 @@ export class RoomService {
   async createRoom(data: Prisma.RoomCreateInput): Promise<Room> {
     return await this.prismaService.room.create({
       data,
-      include: { users: true },
     });
   }
 
   async getAllRooms(user_id: number): Promise<Room[]> {
     return await this.prismaService.room.findMany({
-      where: { users: { some: { id: user_id } } },
+      where: { users: { some: { user: { id: user_id } } } },
     });
   }
 
@@ -28,22 +27,14 @@ export class RoomService {
 
   async addUserToRoom(user_id: number, room_id: number) {
     await this.getRoom(room_id);
-    return await this.prismaService.room.update({
-      where: { id: room_id },
-      data: { users: { connect: { id: user_id } } },
+    return await this.prismaService.usersOnRooms.create({
+      data: { room_id, user_id, permissions: 'sendMessages;' },
     });
   }
 
   async addManyUsersToRoom(users_ids: number[], room_id: number) {
-    return await this.prismaService.room.update({
-      where: { id: room_id },
-      data: {
-        users: {
-          connect: users_ids.map((id) => ({
-            id,
-          })),
-        },
-      },
+    await this.prismaService.usersOnRooms.createMany({
+      data: users_ids.map((id) => ({ room_id, user_id: id })),
     });
   }
 }

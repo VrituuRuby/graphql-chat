@@ -26,7 +26,7 @@ export class UserService {
     if (!room) throw new NotFoundException('Room not found');
 
     const users = await this.prismaService.user.findMany({
-      where: { rooms: { some: { id: room_id } } },
+      where: { rooms: { some: { room_id } } },
     });
 
     return users;

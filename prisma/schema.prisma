@@ -6,24 +6,24 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   name      String
-  email     String    @unique
+  email     String         @unique
   password  String
-  createdAt DateTime  @default(now())
+  createdAt DateTime       @default(now())
   messages  Message[]
-  rooms     Room[]
+  rooms     UsersOnRooms[]
 }
 
 model Room {
-  id       Int       @id @default(autoincrement())
+  id       Int            @id @default(autoincrement())
   name     String
-  users    User[]
+  users    UsersOnRooms[]
   messages Message[]
 }
 
@@ -35,4 +35,14 @@ model Message {
   user_id   Int
   room      Room     @relation(fields: [room_id], references: [id])
   room_id   Int
+}
+
+model UsersOnRooms {
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     Int
+  room        Room     @relation(fields: [room_id], references: [id])
+  room_id     Int
+  permissions String[]
+
+  @@id([user_id, room_id])
 }

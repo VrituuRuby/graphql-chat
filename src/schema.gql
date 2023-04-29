@@ -28,6 +28,7 @@ type Message {
   createdAt: DateTime!
   user_id: Int!
   room_id: Int!
+  user: User!
 }
 
 type AuthDTO {
@@ -72,5 +73,5 @@ input AuthInput {
 }
 
 type Subscription {
-  createdMessage: Message!
+  messageSended(room_ids: [Int!]!): Message!
 }
