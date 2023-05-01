@@ -5,7 +5,8 @@ import {
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { hash } from 'bcrypt';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
+import { UpdateUserDTO } from './models/dto/updateUserDTO';
 
 @Injectable()
 export class UserService {
@@ -39,7 +40,7 @@ export class UserService {
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    const emailExists = await this.prismaService.user.findFirst({
+    const emailExists = await this.prismaService.user.findUnique({
       where: { email: data.email },
     });
 
@@ -52,5 +53,30 @@ export class UserService {
         password: await hash(data.password, 8),
       },
     });
+  }
+
+  async updateData({
+    id,
+    email,
+    name,
+    password,
+  }: UpdateUserDTO): Promise<User> {
+    await this.findOneByID(id);
+    const user = await this.prismaService.user.update({
+      where: { id },
+      data: {
+        email,
+        name,
+        password,
+      },
+    });
+    return user;
+  }
+
+  async delete(id: number): Promise<User> {
+    await this.findOneByID(id);
+    const deletedUser = await this.prismaService.user.delete({ where: { id } });
+    console.log(deletedUser);
+    return deletedUser;
   }
 }

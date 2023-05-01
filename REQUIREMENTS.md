@@ -2,15 +2,16 @@
 
 **Regras Funcionais**
 
-- [] Deve ser possível criar um usuário novo
-- [] Deve ser possível atualizar informações do usuário (email, nome, senha)
-- [] Deve ser possível deletar um usuário
+- [x] Deve ser possível criar um usuário novo
+- [x] Deve ser possível atualizar informações do usuário (email, nome, senha)
+- [x] Deve ser possível deletar um usuário
 
 **Regras de Negócio**
 
-- [] Nao deve ser possível criar um usuário com email existente
+- [x] Nao deve ser possível criar um usuário com email existente
+- [x] Não deve ser possível atualizar informações de usuário inexistente
+- [x] Não deve ser possível deletar um usuário inexistente
 - [] Usuário deve estar autenticado para atualizar informações
-- [] Não deve ser possível deletar um usuário inexistente
 
 # Salas
 
