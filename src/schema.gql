@@ -21,6 +21,7 @@ type Room {
   name: String!
   users: [User!]!
   messages: [Message!]!
+  usersPermissions: [UserPermissions!]!
 }
 
 type Message {
@@ -29,6 +30,13 @@ type Message {
   createdAt: DateTime!
   user_id: Int!
   room_id: Int!
+  user: User!
+}
+
+type UserPermissions {
+  user_id: Int!
+  room_id: Int!
+  permissions: [String!]!
   user: User!
 }
 
@@ -53,7 +61,6 @@ type Mutation {
 }
 
 input CreateMessageInput {
-  user_id: Float!
   room_id: Float!
   text: String!
 }

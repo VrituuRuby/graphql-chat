@@ -18,6 +18,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
 import { AddUsersToRoomInput } from './model/inputs/addUsersToRoomInput';
+import { UserPermissions } from './model/userPermissions.model';
 
 @Resolver((of) => Room)
 export class RoomResolver {
@@ -64,5 +65,10 @@ export class RoomResolver {
       data.users_ids,
       data.room_id,
     );
+  }
+
+  @ResolveField(() => [UserPermissions])
+  async usersPermissions(@Parent() room: Room) {
+    return await this.roomService.getUsersPermissions(room.id);
   }
 }

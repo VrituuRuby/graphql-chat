@@ -15,6 +15,9 @@ import { MessageService } from './message.service';
 import { PubSub } from 'graphql-subscriptions';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/models/user.model';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { useUser } from 'src/user/user.decorator';
 
 @Resolver((of) => Message)
 export class MessageResolver {
@@ -38,9 +41,16 @@ export class MessageResolver {
     return this.pubSub.asyncIterator(room_ids.map((id) => `room_${id}`));
   }
 
+  @UseGuards(AuthGuard)
   @Mutation((returns) => Message)
-  async createMessage(@Args('data') data: CreateMessageInput) {
-    const message = await this.messageService.createMessage(data);
+  async createMessage(
+    @useUser('id') user_id: number,
+    @Args('data') data: CreateMessageInput,
+  ) {
+    const message = await this.messageService.createMessage({
+      ...data,
+      user_id,
+    });
     this.pubSub.publish(`room_${data.room_id}`, { messageSended: message });
     return message;
   }
