@@ -1,0 +1,2 @@
+-- CreateEnum
+CREATE TYPE "RoomPermissions" AS ENUM ('OWNER', 'SEND_MESSAGE', 'ADD_USERS', 'REMOVE_USERS');

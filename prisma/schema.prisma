@@ -38,11 +38,18 @@ model Message {
 }
 
 model UsersOnRooms {
-  user        User     @relation(fields: [user_id], references: [id])
+  user        User              @relation(fields: [user_id], references: [id])
   user_id     Int
-  room        Room     @relation(fields: [room_id], references: [id])
+  room        Room              @relation(fields: [room_id], references: [id])
   room_id     Int
-  permissions String[]
+  permissions RoomPermissions[]
 
-  @@id([user_id, room_id])
+  @@unique([user_id, room_id])
+}
+
+enum RoomPermissions {
+  OWNER
+  SEND_MESSAGE
+  ADD_USERS
+  REMOVE_USERS
 }

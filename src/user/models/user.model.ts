@@ -14,4 +14,7 @@ export class User {
 
   @Field(() => Date)
   createdAt: Date;
+
+  @Field(() => [String], { nullable: true })
+  permissions?: string[];
 }

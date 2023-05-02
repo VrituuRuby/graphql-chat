@@ -17,6 +17,7 @@ import { CreateRoomInput } from './model/inputs/createRoomInput';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
+import { AddUsersToRoomInput } from './model/inputs/addUsersToRoomInput';
 
 @Resolver((of) => Room)
 export class RoomResolver {
@@ -33,7 +34,7 @@ export class RoomResolver {
 
   @ResolveField((returns) => [User], { name: 'users' })
   async getUsersByRooms(@Parent() room: Room) {
-    return this.userService.findAllByRoomID(room.id);
+    return await this.userService.findAllByRoomID(room.id);
   }
 
   @ResolveField((returns) => [Message])
@@ -46,12 +47,22 @@ export class RoomResolver {
     @Args('data') data: CreateRoomInput,
     @useUser('id') user_id: number,
   ) {
-    const room = await this.roomService.createRoom({ name: data.name });
-    await this.roomService.addUserToRoom(user_id, room.id);
+    const room = await this.roomService.createRoom(
+      { name: data.name },
+      user_id,
+    );
 
     if (data.users_ids) {
-      this.roomService.addManyUsersToRoom(data.users_ids, room.id);
+      await this.roomService.addManyUsersToRoom(data.users_ids, room.id);
     }
     return room;
+  }
+
+  @Mutation(() => Room, { name: 'addUsersToRoom' })
+  async addUsersToExistingRoom(@Args('data') data: AddUsersToRoomInput) {
+    return await this.roomService.addManyUsersToRoom(
+      data.users_ids,
+      data.room_id,
+    );
   }
 }

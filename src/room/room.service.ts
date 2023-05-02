@@ -1,14 +1,32 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, Room } from '@prisma/client';
+import { error } from 'console';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class RoomService {
   constructor(private prismaService: PrismaService) {}
-  async createRoom(data: Prisma.RoomCreateInput): Promise<Room> {
-    return await this.prismaService.room.create({
+  async createRoom(
+    data: Prisma.RoomCreateInput,
+    user_id: number,
+  ): Promise<Room> {
+    const room = await this.prismaService.room.create({
       data,
     });
+
+    await this.prismaService.usersOnRooms.create({
+      data: {
+        user_id,
+        room_id: room.id,
+        permissions: ['OWNER', 'ADD_USERS', 'REMOVE_USERS', 'SEND_MESSAGE'],
+      },
+    });
+
+    return room;
   }
 
   async getAllRooms(user_id: number): Promise<Room[]> {
@@ -28,13 +46,44 @@ export class RoomService {
   async addUserToRoom(user_id: number, room_id: number) {
     await this.getRoom(room_id);
     return await this.prismaService.usersOnRooms.create({
-      data: { room_id, user_id, permissions: 'sendMessages;' },
+      data: { room_id, user_id, permissions: ['SEND_MESSAGE'] },
     });
   }
 
-  async addManyUsersToRoom(users_ids: number[], room_id: number) {
-    await this.prismaService.usersOnRooms.createMany({
-      data: users_ids.map((id) => ({ room_id, user_id: id })),
+  async findUserInRoom(user_id: number, room_id: number) {
+    const existingRecord = await this.prismaService.usersOnRooms.findUnique({
+      where: { user_id_room_id: { user_id, room_id } },
     });
+
+    return existingRecord;
+  }
+
+  async addManyUsersToRoom(users_ids: number[], room_id: number) {
+    this.getRoom(room_id); // checks if room exists
+    await Promise.all(
+      users_ids.map(async (id) => {
+        const existingRecord = await this.findUserInRoom(id, room_id);
+        if (existingRecord) return;
+
+        const user = await this.prismaService.user.findUnique({
+          where: { id },
+        });
+        if (!user) return;
+
+        await this.prismaService.usersOnRooms.create({
+          data: { user_id: id, room_id, permissions: ['SEND_MESSAGE'] },
+        });
+      }),
+    );
+    return await this.getRoom(room_id);
+  }
+
+  async getUsersPermissions(room_id: number) {
+    this.getRoom(room_id);
+    const users = await this.prismaService.usersOnRooms.findMany({
+      include: { user: true },
+    });
+    console.log(users);
+    return users;
   }
 }
