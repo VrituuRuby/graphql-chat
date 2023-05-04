@@ -14,6 +14,7 @@ import { RoomModule } from './room/room.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
+import { PermissionsService } from './permissions/permissions.service';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { UserService } from './user/user.service';
     RoomService,
     MessageResolver,
     UserService,
+    PermissionsService,
   ],
 })
 export class AppModule {}

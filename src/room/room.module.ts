@@ -5,6 +5,7 @@ import { RoomResolver } from './room.resolver';
 import { RoomService } from './room.service';
 import { UsersResolver } from 'src/user/user.resolver';
 import { UserService } from 'src/user/user.service';
+import { PermissionsService } from 'src/permissions/permissions.service';
 
 @Module({
   imports: [],
@@ -14,6 +15,7 @@ import { UserService } from 'src/user/user.service';
     RoomResolver,
     RoomService,
     UserService,
+    PermissionsService,
   ],
 })
 export class RoomModule {}

@@ -18,6 +18,7 @@ import { User } from 'src/user/models/user.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
+import { PermissionsService } from 'src/permissions/permissions.service';
 
 @Resolver((of) => Message)
 export class MessageResolver {
@@ -25,6 +26,7 @@ export class MessageResolver {
   constructor(
     private messageService: MessageService,
     private userService: UserService,
+    private permissionService: PermissionsService,
   ) {
     this.pubSub = new PubSub();
   }
@@ -47,12 +49,20 @@ export class MessageResolver {
     @useUser('id') user_id: number,
     @Args('data') data: CreateMessageInput,
   ) {
-    const message = await this.messageService.createMessage({
-      ...data,
+    const hasPermission = await this.permissionService.validatePermissions(
       user_id,
-    });
-    this.pubSub.publish(`room_${data.room_id}`, { messageSended: message });
-    return message;
+      ['OWNER', 'SEND_MESSAGE'],
+      data.room_id,
+    );
+
+    if (hasPermission) {
+      const message = await this.messageService.createMessage({
+        ...data,
+        user_id,
+      });
+      this.pubSub.publish(`room_${data.room_id}`, { messageSended: message });
+      return message;
+    }
   }
 
   @ResolveField((returns) => User, { name: 'user' })

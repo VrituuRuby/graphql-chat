@@ -19,6 +19,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
 import { AddUsersToRoomInput } from './model/inputs/addUsersToRoomInput';
 import { UserPermissions } from './model/userPermissions.model';
+import { Permissions } from 'src/permissions/permissions.decorator';
+import { PermissionsGuard } from 'src/permissions/permissions.guard';
+import { RoomPermissions } from '@prisma/client';
+import { PermissionsService } from 'src/permissions/permissions.service';
 
 @Resolver((of) => Room)
 export class RoomResolver {
@@ -26,6 +30,7 @@ export class RoomResolver {
     private messageService: MessageService,
     private userService: UserService,
     private roomService: RoomService,
+    private permissionsService: PermissionsService,
   ) {}
 
   @Query((returns) => Room)
@@ -39,7 +44,7 @@ export class RoomResolver {
   }
 
   @ResolveField((returns) => [Message])
-  async messages(@Parent() room: Room) {
+  async messages(@Parent() room: Room, @useUser('id') id: number) {
     return this.messageService.findAllByRoom(room.id);
   }
   @UseGuards(AuthGuard)
@@ -59,12 +64,23 @@ export class RoomResolver {
     return room;
   }
 
+  @UseGuards(AuthGuard, PermissionsGuard)
   @Mutation(() => Room, { name: 'addUsersToRoom' })
-  async addUsersToExistingRoom(@Args('data') data: AddUsersToRoomInput) {
-    return await this.roomService.addManyUsersToRoom(
-      data.users_ids,
+  async addUsersToExistingRoom(
+    @Args('data') data: AddUsersToRoomInput,
+    @useUser('id') id: number,
+  ) {
+    const hasPermission = await this.permissionsService.validatePermissions(
+      id,
+      ['OWNER', 'ADD_USERS'],
       data.room_id,
     );
+
+    if (hasPermission)
+      return await this.roomService.addManyUsersToRoom(
+        data.users_ids,
+        data.room_id,
+      );
   }
 
   @ResolveField(() => [UserPermissions])

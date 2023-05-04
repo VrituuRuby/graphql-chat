@@ -83,7 +83,6 @@ export class RoomService {
     const users = await this.prismaService.usersOnRooms.findMany({
       include: { user: true },
     });
-    console.log(users);
     return users;
   }
 }
