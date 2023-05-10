@@ -19,10 +19,11 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
 import { AddUsersToRoomInput } from './model/inputs/addUsersToRoomInput';
 import { UserPermissions } from './model/userPermissions.model';
-import { Permissions } from 'src/permissions/permissions.decorator';
 import { PermissionsGuard } from 'src/permissions/permissions.guard';
-import { RoomPermissions } from '@prisma/client';
 import { PermissionsService } from 'src/permissions/permissions.service';
+import { Permissions } from 'src/permissions/permissions.decorator';
+import { RoomPermissions } from 'src/permissions/models/permissions.enum';
+import { UpdateUserPermissionsInput } from './model/inputs/updateUserPermissionsInput';
 
 @Resolver((of) => Room)
 export class RoomResolver {
@@ -33,9 +34,13 @@ export class RoomResolver {
     private permissionsService: PermissionsService,
   ) {}
 
+  @UseGuards(AuthGuard)
   @Query((returns) => Room)
-  async room(@Args('id', { type: () => Int }) id: number) {
-    return await this.roomService.getRoom(id);
+  async room(
+    @Args('id', { type: () => Int }) id: number,
+    @useUser('id') user_id: number,
+  ) {
+    return await this.roomService.getRoomData(id, user_id);
   }
 
   @ResolveField((returns) => [User], { name: 'users' })
@@ -44,9 +49,10 @@ export class RoomResolver {
   }
 
   @ResolveField((returns) => [Message])
-  async messages(@Parent() room: Room, @useUser('id') id: number) {
+  async messages(@Parent() room: Room) {
     return this.messageService.findAllByRoom(room.id);
   }
+
   @UseGuards(AuthGuard)
   @Mutation(() => Room)
   async createRoom(
@@ -65,6 +71,7 @@ export class RoomResolver {
   }
 
   @UseGuards(AuthGuard, PermissionsGuard)
+  @Permissions('ADD_USERS', 'OWNER')
   @Mutation(() => Room, { name: 'addUsersToRoom' })
   async addUsersToExistingRoom(
     @Args('data') data: AddUsersToRoomInput,
@@ -86,5 +93,16 @@ export class RoomResolver {
   @ResolveField(() => [UserPermissions])
   async usersPermissions(@Parent() room: Room) {
     return await this.roomService.getUsersPermissions(room.id);
+  }
+
+  @UseGuards(AuthGuard, PermissionsGuard)
+  @Permissions('OWNER')
+  @Mutation(() => UserPermissions)
+  async updateUserPermissions(@Args('data') data: UpdateUserPermissionsInput) {
+    return await this.permissionsService.updateUserPermissions(
+      data.room_id,
+      data.user_id,
+      data.permissions,
+    );
   }
 }

@@ -4,12 +4,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class MessageService {
   constructor(private prismaService: PrismaService) {}
+
   async findAllByRoom(room_id: number) {
     return await this.prismaService.message.findMany({ where: { room_id } });
   }
@@ -28,8 +28,6 @@ export class MessageService {
     const userIsInRoom = await this.prismaService.usersOnRooms.findFirst({
       where: { user_id: data.user_id, room_id: data.room_id },
     });
-
-    console.log(userIsInRoom);
 
     if (!userIsInRoom)
       throw new UnauthorizedException(

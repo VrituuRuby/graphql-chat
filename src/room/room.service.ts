@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Prisma, Room } from '@prisma/client';
 import { error } from 'console';
@@ -35,10 +36,21 @@ export class RoomService {
     });
   }
 
-  async getRoom(id: number): Promise<Room> {
+  private async getRoom(id: number): Promise<Room> {
     const room = await this.prismaService.room.findUnique({ where: { id } });
-
     if (!room) throw new NotFoundException('Room not found');
+    return room;
+  }
+
+  async getRoomData(room_id: number, user_id: number) {
+    const room = await this.getRoom(room_id);
+    if (!room) throw new NotFoundException('Room not found');
+    const userInRoom = await this.prismaService.usersOnRooms.findUnique({
+      where: { user_id_room_id: { room_id, user_id } },
+    });
+
+    if (!userInRoom)
+      throw new UnauthorizedException("User isn't allowed to access room");
 
     return room;
   }
@@ -63,6 +75,7 @@ export class RoomService {
     await Promise.all(
       users_ids.map(async (id) => {
         const existingRecord = await this.findUserInRoom(id, room_id);
+        console.log(existingRecord);
         if (existingRecord) return;
 
         const user = await this.prismaService.user.findUnique({
@@ -81,6 +94,7 @@ export class RoomService {
   async getUsersPermissions(room_id: number) {
     this.getRoom(room_id);
     const users = await this.prismaService.usersOnRooms.findMany({
+      where: { room_id },
       include: { user: true },
     });
     return users;

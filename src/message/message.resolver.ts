@@ -1,6 +1,5 @@
 import {
   Args,
-  ID,
   Int,
   Mutation,
   Parent,
@@ -18,7 +17,8 @@ import { User } from 'src/user/models/user.model';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
-import { PermissionsService } from 'src/permissions/permissions.service';
+import { Permissions } from 'src/permissions/permissions.decorator';
+import { PermissionsGuard } from 'src/permissions/permissions.guard';
 
 @Resolver((of) => Message)
 export class MessageResolver {
@@ -26,7 +26,6 @@ export class MessageResolver {
   constructor(
     private messageService: MessageService,
     private userService: UserService,
-    private permissionService: PermissionsService,
   ) {
     this.pubSub = new PubSub();
   }
@@ -43,26 +42,19 @@ export class MessageResolver {
     return this.pubSub.asyncIterator(room_ids.map((id) => `room_${id}`));
   }
 
-  @UseGuards(AuthGuard)
+  @Permissions('OWNER', 'SEND_MESSAGE')
+  @UseGuards(AuthGuard, PermissionsGuard)
   @Mutation((returns) => Message)
   async createMessage(
     @useUser('id') user_id: number,
     @Args('data') data: CreateMessageInput,
   ) {
-    const hasPermission = await this.permissionService.validatePermissions(
+    const message = await this.messageService.createMessage({
+      ...data,
       user_id,
-      ['OWNER', 'SEND_MESSAGE'],
-      data.room_id,
-    );
-
-    if (hasPermission) {
-      const message = await this.messageService.createMessage({
-        ...data,
-        user_id,
-      });
-      this.pubSub.publish(`room_${data.room_id}`, { messageSended: message });
-      return message;
-    }
+    });
+    this.pubSub.publish(`room_${data.room_id}`, { messageSended: message });
+    return message;
   }
 
   @ResolveField((returns) => User, { name: 'user' })

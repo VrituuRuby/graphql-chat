@@ -57,6 +57,7 @@ type Mutation {
   createUser(data: CreateUserInput!): User!
   createRoom(data: CreateRoomInput!): Room!
   addUsersToRoom(data: AddUsersToRoomInput!): Room!
+  updateUserPermissions(data: UpdateUserPermissionsInput!): UserPermissions!
   signIn(data: AuthInput!): AuthDTO!
 }
 
@@ -79,6 +80,12 @@ input CreateRoomInput {
 input AddUsersToRoomInput {
   room_id: Int!
   users_ids: [Int!]!
+}
+
+input UpdateUserPermissionsInput {
+  room_id: Float!
+  user_id: Float!
+  permissions: [String!]!
 }
 
 input AuthInput {
