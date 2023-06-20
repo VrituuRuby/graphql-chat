@@ -19,6 +19,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
 import { Permissions } from 'src/permissions/permissions.decorator';
 import { PermissionsGuard } from 'src/permissions/permissions.guard';
+import { GetMessageInput } from './model/inputs/getMessageInput';
 
 @Resolver((of) => Message)
 export class MessageResolver {
@@ -30,9 +31,11 @@ export class MessageResolver {
     this.pubSub = new PubSub();
   }
 
+  @UseGuards(AuthGuard, PermissionsGuard)
+  @Permissions('SEND_MESSAGE')
   @Query((returns) => [Message])
-  async messages(@Args('room_id', { type: () => Int }) room_id: number) {
-    return await this.messageService.findAllByRoom(room_id);
+  async messages(@Args('data') data: GetMessageInput) {
+    return await this.messageService.findAllByRoom(data.room_id);
   }
 
   @Subscription((returns) => Message)

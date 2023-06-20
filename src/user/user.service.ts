@@ -34,9 +34,11 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.prismaService.user.findMany({
+    const users = await this.prismaService.user.findMany({
       include: { rooms: true, messages: true },
     });
+    console.log(users);
+    return users;
   }
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {

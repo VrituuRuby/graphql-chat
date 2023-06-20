@@ -38,6 +38,7 @@ type UserPermissions {
   room_id: Int!
   permissions: [String!]!
   user: User!
+  room: Room!
 }
 
 type AuthDTO {
@@ -46,10 +47,14 @@ type AuthDTO {
 }
 
 type Query {
-  messages(room_id: Int!): [Message!]!
+  messages(data: GetMessageInput!): [Message!]!
   users: [User!]!
-  user(id: Int!): User!
+  user: User!
   room(id: Int!): Room!
+}
+
+input GetMessageInput {
+  room_id: Float!
 }
 
 type Mutation {

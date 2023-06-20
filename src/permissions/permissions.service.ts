@@ -9,6 +9,18 @@ import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class PermissionsService {
   constructor(private prismaService: PrismaService) {}
+
+  async validateUserOnRoom(user_id: number, room_id: number) {
+    const userOnRoom = await this.prismaService.usersOnRooms.findUnique({
+      where: { user_id_room_id: { room_id, user_id } },
+    });
+    if (!userOnRoom)
+      throw new UnauthorizedException(
+        `User ${user_id} isn't part of the room ${room_id}`,
+      );
+    return true;
+  }
+
   async validatePermissions(
     user_id: number,
     requiredPermissions: RoomPermissions[],
@@ -38,7 +50,7 @@ export class PermissionsService {
   async updateUserPermissions(
     room_id: number,
     user_id: number,
-    permission: RoomPermissions[],
+    permissions: RoomPermissions[],
   ) {
     const room = await this.prismaService.room.findUnique({
       where: { id: room_id },
@@ -57,11 +69,47 @@ export class PermissionsService {
     if (!userOnRoom)
       throw new UnauthorizedException("User isn't allowed to access room");
 
-    return this.prismaService.usersOnRooms.update({
-      where: { user_id_room_id: { room_id, user_id } },
-      data: {
-        permissions: permission,
-      },
+    const uniquePermissions = [...new Set(permissions)];
+
+    if (
+      await this.validatePermissionsViolations(
+        room_id,
+        user_id,
+        uniquePermissions,
+      )
+    )
+      return this.prismaService.usersOnRooms.update({
+        where: { user_id_room_id: { room_id, user_id } },
+        data: {
+          permissions: uniquePermissions,
+        },
+        include: {
+          user: true,
+          room: true,
+        },
+      });
+  }
+
+  private async validatePermissionsViolations(
+    room_id: number,
+    user_id: number,
+    updatedPermissions: RoomPermissions[],
+  ) {
+    const owner = await this.prismaService.usersOnRooms.findFirst({
+      where: { room_id, permissions: { hasSome: 'OWNER' } },
+      include: { user: true },
     });
+
+    if (user_id !== owner.user_id) return true;
+
+    const hasOwnerInPermissions = updatedPermissions.find(
+      (permission) => permission === 'OWNER',
+    );
+
+    if (hasOwnerInPermissions === undefined)
+      throw new BadRequestException(
+        "Owner user can't self remove OWNER permission",
+      );
+    return true;
   }
 }

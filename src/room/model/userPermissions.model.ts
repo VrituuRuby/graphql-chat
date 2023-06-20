@@ -1,5 +1,6 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { User } from 'src/user/models/user.model';
+import { Room } from './room.model';
 
 @ObjectType()
 export class UserPermissions {
@@ -12,6 +13,9 @@ export class UserPermissions {
   @Field(() => [String])
   permissions: string[];
 
-  @Field()
+  @Field(() => User)
   user: User;
+
+  @Field(() => Room)
+  room: Room;
 }

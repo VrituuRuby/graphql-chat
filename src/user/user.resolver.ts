@@ -15,6 +15,7 @@ import { Room } from 'src/room/model/room.model';
 import { RoomService } from 'src/room/room.service';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { useUser } from './user.decorator';
 
 @Resolver((of) => User)
 export class UsersResolver {
@@ -24,15 +25,16 @@ export class UsersResolver {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Query((returns) => [User]!, { name: 'users' })
+  @Query((returns) => [User], { name: 'users' })
   async getAllUsers() {
     const users = await this.userService.findAll();
     return users;
   }
 
+  @UseGuards(AuthGuard)
   @Query((returns) => User, { name: 'user' })
-  async getOneUser(@Args('id', { type: () => Int }) id: number) {
-    return await this.userService.findOneByID(id);
+  async getOneUser(@useUser('id') user_id: number) {
+    return await this.userService.findOneByID(user_id);
   }
 
   @Mutation((returns) => User)

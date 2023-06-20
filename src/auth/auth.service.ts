@@ -24,13 +24,10 @@ export class AuthService {
     if (!passwordMatch)
       throw new UnauthorizedException('Invalid email or password');
 
-    const payload = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.createdAt,
-    };
-    const token = await this.jwtService.signAsync({ sub: payload });
+    const token = await this.jwtService.signAsync(
+      { sub: user.id },
+      { secret: 'JWT_SECRET' },
+    );
 
     return {
       user: user,

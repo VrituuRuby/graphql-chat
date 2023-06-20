@@ -22,7 +22,6 @@ import { UserPermissions } from './model/userPermissions.model';
 import { PermissionsGuard } from 'src/permissions/permissions.guard';
 import { PermissionsService } from 'src/permissions/permissions.service';
 import { Permissions } from 'src/permissions/permissions.decorator';
-import { RoomPermissions } from 'src/permissions/models/permissions.enum';
 import { UpdateUserPermissionsInput } from './model/inputs/updateUserPermissionsInput';
 
 @Resolver((of) => Room)

@@ -1,7 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Observable } from 'rxjs';
 import { RoomPermissions } from '@prisma/client';
 import { PermissionsService } from './permissions.service';
 
@@ -12,17 +16,19 @@ export class PermissionsGuard implements CanActivate {
     private permissionsService: PermissionsService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const [_, args] = context.getArgs();
+    const { data } = args;
+    const { user } = GqlExecutionContext.create(context).getContext().req;
+
+    console.log(args);
+    await this.permissionsService.validateUserOnRoom(user.id, data.room_id);
+
     const requiredPermissions = this.reflector.get<RoomPermissions[]>(
       'requiredPermissions',
       context.getHandler(),
     );
 
-    const [_, args] = context.getArgs();
-    const { data } = args;
-
-    if (!requiredPermissions) return true;
-
-    const { user } = GqlExecutionContext.create(context).getContext().req;
+    if (requiredPermissions.length === 0) return true;
 
     const hasPermission = await this.permissionsService.validatePermissions(
       user.id,

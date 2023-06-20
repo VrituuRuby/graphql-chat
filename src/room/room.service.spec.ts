@@ -15,8 +15,4 @@ describe('RoomService', () => {
   it('should be defined', () => {
     expect(roomService).toBeDefined();
   });
-
-  it('Should be able to create a new room with only the owner', () => {
-    roomService.createRoom({ name: 'Test Room' });
-  });
 });

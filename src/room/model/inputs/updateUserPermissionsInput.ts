@@ -13,6 +13,6 @@ export class UpdateUserPermissionsInput {
   user_id: number;
 
   @Field(() => [String])
-  @IsEnum(RoomPermissions)
+  @IsEnum(RoomPermissions, { each: true })
   permissions: RoomPermissions[];
 }
