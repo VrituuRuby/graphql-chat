@@ -18,10 +18,9 @@ export class PermissionsGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const [_, args] = context.getArgs();
     const { data } = args;
-    const { user } = GqlExecutionContext.create(context).getContext().req;
+    const { user_id } = GqlExecutionContext.create(context).getContext().req;
 
-    console.log(args);
-    await this.permissionsService.validateUserOnRoom(user.id, data.room_id);
+    await this.permissionsService.validateUserOnRoom(user_id, data.room_id);
 
     const requiredPermissions = this.reflector.get<RoomPermissions[]>(
       'requiredPermissions',
@@ -31,7 +30,7 @@ export class PermissionsGuard implements CanActivate {
     if (requiredPermissions.length === 0) return true;
 
     const hasPermission = await this.permissionsService.validatePermissions(
-      user.id,
+      user_id,
       requiredPermissions,
       data.room_id,
     );

@@ -56,7 +56,7 @@ export class RoomResolver {
   @Mutation(() => Room)
   async createRoom(
     @Args('data') data: CreateRoomInput,
-    @useUser('id') user_id: number,
+    @useUser() user_id: number,
   ) {
     const room = await this.roomService.createRoom(
       { name: data.name },
@@ -74,7 +74,7 @@ export class RoomResolver {
   @Mutation(() => Room, { name: 'addUsersToRoom' })
   async addUsersToExistingRoom(
     @Args('data') data: AddUsersToRoomInput,
-    @useUser('id') id: number,
+    @useUser() id: number,
   ) {
     const hasPermission = await this.permissionsService.validatePermissions(
       id,

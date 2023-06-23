@@ -5,6 +5,7 @@ import { MessageResolver } from './message.resolver';
 import { UserService } from 'src/user/user.service';
 import { UserModule } from 'src/user/user.module';
 import { PermissionsService } from 'src/permissions/permissions.service';
+import { RoomService } from 'src/room/room.service';
 
 @Module({
   imports: [UserModule],
@@ -13,6 +14,7 @@ import { PermissionsService } from 'src/permissions/permissions.service';
     PrismaService,
     MessageResolver,
     UserService,
+    RoomService,
     PermissionsService,
   ],
 })

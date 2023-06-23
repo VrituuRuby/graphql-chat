@@ -37,7 +37,7 @@ export class UsersResolver {
     return await this.userService.findOneByID(user_id);
   }
 
-  @Mutation((returns) => User)
+  @Mutation((returns) => User, { name: 'register' })
   async createUser(@Args('data') data: CreateUserInput) {
     return await this.userService.createUser(data);
   }

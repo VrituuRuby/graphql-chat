@@ -20,6 +20,8 @@ import { useUser } from 'src/user/user.decorator';
 import { Permissions } from 'src/permissions/permissions.decorator';
 import { PermissionsGuard } from 'src/permissions/permissions.guard';
 import { GetMessageInput } from './model/inputs/getMessageInput';
+import { RoomService } from 'src/room/room.service';
+import { Room } from 'src/room/model/room.model';
 
 @Resolver((of) => Message)
 export class MessageResolver {
@@ -27,6 +29,7 @@ export class MessageResolver {
   constructor(
     private messageService: MessageService,
     private userService: UserService,
+    private roomService: RoomService,
   ) {
     this.pubSub = new PubSub();
   }
@@ -49,7 +52,7 @@ export class MessageResolver {
   @UseGuards(AuthGuard, PermissionsGuard)
   @Mutation((returns) => Message)
   async createMessage(
-    @useUser('id') user_id: number,
+    @useUser() user_id: number,
     @Args('data') data: CreateMessageInput,
   ) {
     const message = await this.messageService.createMessage({
@@ -63,5 +66,10 @@ export class MessageResolver {
   @ResolveField((returns) => User, { name: 'user' })
   async getUser(@Parent() message: Message) {
     return await this.userService.findOneByID(message.user_id);
+  }
+
+  @ResolveField((returns) => Room, { name: 'room' })
+  async getRoom(@Parent() message: Message, @useUser() user_id: number) {
+    return await this.roomService.getRoomData(message.room_id, user_id);
   }
 }

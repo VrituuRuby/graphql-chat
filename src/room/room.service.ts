@@ -75,7 +75,6 @@ export class RoomService {
     await Promise.all(
       users_ids.map(async (id) => {
         const existingRecord = await this.findUserInRoom(id, room_id);
-        console.log(existingRecord);
         if (existingRecord) return;
 
         const user = await this.prismaService.user.findUnique({

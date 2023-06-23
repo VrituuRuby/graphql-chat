@@ -37,7 +37,6 @@ export class UserService {
     const users = await this.prismaService.user.findMany({
       include: { rooms: true, messages: true },
     });
-    console.log(users);
     return users;
   }
 

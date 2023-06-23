@@ -31,6 +31,7 @@ type Message {
   user_id: Int!
   room_id: Int!
   user: User!
+  room: Room!
 }
 
 type UserPermissions {
@@ -59,7 +60,7 @@ input GetMessageInput {
 
 type Mutation {
   createMessage(data: CreateMessageInput!): Message!
-  createUser(data: CreateUserInput!): User!
+  register(data: CreateUserInput!): User!
   createRoom(data: CreateRoomInput!): Room!
   addUsersToRoom(data: AddUsersToRoomInput!): Room!
   updateUserPermissions(data: UpdateUserPermissionsInput!): UserPermissions!
