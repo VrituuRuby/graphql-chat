@@ -100,5 +100,5 @@ input AuthInput {
 }
 
 type Subscription {
-  messageSended(room_ids: [Int!]!): Message!
+  newMessage(room_ids: [Int!]!): Message!
 }

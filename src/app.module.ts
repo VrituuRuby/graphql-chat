@@ -11,10 +11,10 @@ import { RoomService } from './room/room.service';
 import { MessageResolver } from './message/message.resolver';
 import { MessageModule } from './message/message.module';
 import { RoomModule } from './room/room.module';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
 import { PermissionsService } from './permissions/permissions.service';
+import { PubSub } from 'graphql-subscriptions';
 
 @Module({
   imports: [
@@ -27,6 +27,9 @@ import { PermissionsService } from './permissions/permissions.service';
         },
         'subscriptions-transport-ws': {
           path: '/graphql',
+          onConnect: (connectionParams) => {
+            return { token: connectionParams.access_token };
+          },
         },
       },
     }),
@@ -44,6 +47,7 @@ import { PermissionsService } from './permissions/permissions.service';
     MessageResolver,
     UserService,
     PermissionsService,
+    { provide: 'PUB_SUB', useValue: new PubSub() },
   ],
 })
 export class AppModule {}

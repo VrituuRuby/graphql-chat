@@ -14,7 +14,7 @@ import { MessageService } from './message.service';
 import { PubSub } from 'graphql-subscriptions';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/models/user.model';
-import { UseGuards } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { useUser } from 'src/user/user.decorator';
 import { Permissions } from 'src/permissions/permissions.decorator';
@@ -25,14 +25,13 @@ import { Room } from 'src/room/model/room.model';
 
 @Resolver((of) => Message)
 export class MessageResolver {
-  private pubSub: PubSub;
   constructor(
     private messageService: MessageService,
     private userService: UserService,
     private roomService: RoomService,
-  ) {
-    this.pubSub = new PubSub();
-  }
+    @Inject('PUB_SUB')
+    private pubSub: PubSub,
+  ) {}
 
   @UseGuards(AuthGuard, PermissionsGuard)
   @Permissions('SEND_MESSAGE')
@@ -42,9 +41,12 @@ export class MessageResolver {
   }
 
   @Subscription((returns) => Message)
-  async messageSended(
+  @Permissions()
+  // @UseGuards(AuthGuard, PermissionsGuard)
+  async newMessage(
     @Args('room_ids', { type: () => [Int] }) room_ids: number[],
   ) {
+    console.log(room_ids);
     return this.pubSub.asyncIterator(room_ids.map((id) => `room_${id}`));
   }
 
@@ -59,7 +61,7 @@ export class MessageResolver {
       ...data,
       user_id,
     });
-    this.pubSub.publish(`room_${data.room_id}`, { messageSended: message });
+    this.pubSub.publish(`room_${data.room_id}`, { newMessage: message });
     return message;
   }
 

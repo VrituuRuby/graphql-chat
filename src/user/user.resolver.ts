@@ -33,7 +33,7 @@ export class UsersResolver {
 
   @UseGuards(AuthGuard)
   @Query((returns) => User, { name: 'user' })
-  async getOneUser(@useUser('id') user_id: number) {
+  async getOneUser(@useUser() user_id: number) {
     return await this.userService.findOneByID(user_id);
   }
 

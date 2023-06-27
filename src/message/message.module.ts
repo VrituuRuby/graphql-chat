@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { UserModule } from 'src/user/user.module';
 import { PermissionsService } from 'src/permissions/permissions.service';
 import { RoomService } from 'src/room/room.service';
+import { PubSub } from 'graphql-subscriptions';
 
 @Module({
   imports: [UserModule],
@@ -16,6 +17,7 @@ import { RoomService } from 'src/room/room.service';
     UserService,
     RoomService,
     PermissionsService,
+    { provide: 'PUB_SUB', useValue: new PubSub() },
   ],
 })
 export class MessageModule {}

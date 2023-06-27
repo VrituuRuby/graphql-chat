@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Prisma, Room } from '@prisma/client';
+import { Prisma, Room, User } from '@prisma/client';
 import { error } from 'console';
 import { PrismaService } from 'src/prisma.service';
 
@@ -90,7 +90,7 @@ export class RoomService {
     return await this.getRoom(room_id);
   }
 
-  async getUsersPermissions(room_id: number) {
+  async getUsersPermissions(room_id: number): Promise<PermissionsWithUser[]> {
     this.getRoom(room_id);
     const users = await this.prismaService.usersOnRooms.findMany({
       where: { room_id },
@@ -99,3 +99,7 @@ export class RoomService {
     return users;
   }
 }
+
+type PermissionsWithUser = Prisma.UsersOnRoomsGetPayload<{
+  include: { user: true };
+}>;
