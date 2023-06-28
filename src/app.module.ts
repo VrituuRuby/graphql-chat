@@ -28,6 +28,7 @@ import { PubSub } from 'graphql-subscriptions';
         'subscriptions-transport-ws': {
           path: '/graphql',
           onConnect: (connectionParams) => {
+            console.log('APP MODULE TOKEN:', connectionParams.access_token);
             return { token: connectionParams.access_token };
           },
         },

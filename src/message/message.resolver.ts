@@ -41,13 +41,11 @@ export class MessageResolver {
   }
 
   @Subscription((returns) => Message)
-  @Permissions()
-  // @UseGuards(AuthGuard, PermissionsGuard)
-  async newMessage(
-    @Args('room_ids', { type: () => [Int] }) room_ids: number[],
-  ) {
-    console.log(room_ids);
-    return this.pubSub.asyncIterator(room_ids.map((id) => `room_${id}`));
+  async roomMessages(@Args('user_id', { type: () => Int }) user_id: number) {
+    const userRoomsIds = (await this.roomService.getAllRooms(user_id)).map(
+      (room) => `room_${room.id}`,
+    );
+    return this.pubSub.asyncIterator(userRoomsIds);
   }
 
   @Permissions('OWNER', 'SEND_MESSAGE')
@@ -61,7 +59,7 @@ export class MessageResolver {
       ...data,
       user_id,
     });
-    this.pubSub.publish(`room_${data.room_id}`, { newMessage: message });
+    this.pubSub.publish(`room_${data.room_id}`, { roomMessages: message });
     return message;
   }
 

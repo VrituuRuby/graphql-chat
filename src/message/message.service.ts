@@ -11,7 +11,10 @@ export class MessageService {
   constructor(private prismaService: PrismaService) {}
 
   async findAllByRoom(room_id: number) {
-    return await this.prismaService.message.findMany({ where: { room_id } });
+    return await this.prismaService.message.findMany({
+      where: { room_id },
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
   async createMessage(data: Prisma.MessageUncheckedCreateInput) {
