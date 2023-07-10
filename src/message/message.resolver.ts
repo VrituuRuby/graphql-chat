@@ -1,5 +1,6 @@
 import {
   Args,
+  Context,
   Int,
   Mutation,
   Parent,
@@ -40,11 +41,14 @@ export class MessageResolver {
     return await this.messageService.findAllByRoom(data.room_id);
   }
 
+  @UseGuards(AuthGuard)
   @Subscription((returns) => Message)
-  async roomMessages(@Args('user_id', { type: () => Int }) user_id: number) {
+  async roomsMessages(@useUser() user_id: number) {
+    console.log('Subscription, user_id:', user_id);
     const userRoomsIds = (await this.roomService.getAllRooms(user_id)).map(
       (room) => `room_${room.id}`,
     );
+    console.log(userRoomsIds);
     return this.pubSub.asyncIterator(userRoomsIds);
   }
 
@@ -59,7 +63,7 @@ export class MessageResolver {
       ...data,
       user_id,
     });
-    this.pubSub.publish(`room_${data.room_id}`, { roomMessages: message });
+    this.pubSub.publish(`room_${data.room_id}`, { roomsMessages: message });
     return message;
   }
 
@@ -68,6 +72,7 @@ export class MessageResolver {
     return await this.userService.findOneByID(message.user_id);
   }
 
+  @UseGuards(AuthGuard)
   @ResolveField((returns) => Room, { name: 'room' })
   async getRoom(@Parent() message: Message, @useUser() user_id: number) {
     return await this.roomService.getRoomData(message.room_id, user_id);

@@ -15,30 +15,35 @@ import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
 import { PermissionsService } from './permissions/permissions.service';
 import { PubSub } from 'graphql-subscriptions';
+import { Context } from 'graphql-ws';
 
 @Module({
   imports: [
+    UserModule,
+    MessageModule,
+    RoomModule,
+    AuthModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
         'graphql-ws': {
           path: '/graphql',
+          onConnect: (context: Context<any, { access_token: string }>) => {
+            const { connectionParams, extra } = context;
+            extra.access_token = connectionParams.access_token;
+          },
         },
         'subscriptions-transport-ws': {
           path: '/graphql',
           onConnect: (connectionParams) => {
-            console.log('APP MODULE TOKEN:', connectionParams.access_token);
-            return { token: connectionParams.access_token };
+            return { access_token: connectionParams.access_token };
           },
         },
       },
     }),
-    UserModule,
-    MessageModule,
-    RoomModule,
-    AuthModule,
   ],
+
   controllers: [AppController],
   providers: [
     AppService,

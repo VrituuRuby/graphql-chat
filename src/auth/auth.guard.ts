@@ -13,14 +13,22 @@ export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const { req } = ctx.getContext();
-    const token = this.extractTokenFromRequest(req);
-
-    const payload = await this.jwtService.verifyAsync(token, {
-      secret: 'JWT_SECRET',
-    });
-    req.user_id = payload.sub;
-    return true;
+    const conn = ctx.getContext();
+    if (conn.req.extra) {
+      const token = conn.req.extra.access_token;
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: 'JWT_SECRET',
+      });
+      conn.req.user_id = payload.sub;
+      return true;
+    } else {
+      const token = this.extractTokenFromRequest(conn.req);
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: 'JWT_SECRET',
+      });
+      conn.req.user_id = payload.sub;
+      return true;
+    }
   }
 
   private extractTokenFromRequest(request: Request) {

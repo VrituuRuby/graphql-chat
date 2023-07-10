@@ -100,5 +100,5 @@ input AuthInput {
 }
 
 type Subscription {
-  roomMessages(user_id: Int!): Message!
+  roomsMessages: Message!
 }
