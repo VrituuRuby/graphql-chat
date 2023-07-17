@@ -4,4 +4,6 @@ import { Field, InputType } from '@nestjs/graphql';
 export class GetMessageInput {
   @Field()
   room_id: number;
+  @Field()
+  orderBy?: 'asc' | 'desc' = 'asc';
 }

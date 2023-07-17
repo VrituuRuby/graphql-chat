@@ -34,6 +34,12 @@ export class RoomResolver {
   ) {}
 
   @UseGuards(AuthGuard)
+  @Query((returns) => [Room])
+  async rooms(@useUser() user_id: number) {
+    return this.roomService.getAllRooms(user_id);
+  }
+
+  @UseGuards(AuthGuard)
   @Query((returns) => Room)
   async room(
     @Args('id', { type: () => Int }) id: number,
@@ -48,8 +54,11 @@ export class RoomResolver {
   }
 
   @ResolveField((returns) => [Message])
-  async messages(@Parent() room: Room) {
-    return this.messageService.findAllByRoom(room.id);
+  async messages(
+    @Parent() room: Room,
+    @Args('orderBy', { type: () => String }) orderBy: string,
+  ) {
+    return this.messageService.findAllByRoom(room.id, orderBy);
   }
 
   @UseGuards(AuthGuard)

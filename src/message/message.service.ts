@@ -3,21 +3,23 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Message, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class MessageService {
   constructor(private prismaService: PrismaService) {}
 
-  async findAllByRoom(room_id: number) {
+  async findAllByRoom(room_id: number, orderBy = 'asc') {
     return await this.prismaService.message.findMany({
       where: { room_id },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: orderBy === 'desc' ? 'desc' : 'asc' },
     });
   }
 
-  async createMessage(data: Prisma.MessageUncheckedCreateInput) {
+  async createMessage(
+    data: Prisma.MessageUncheckedCreateInput,
+  ): Promise<Message> {
     const room = await this.prismaService.room.findUnique({
       where: { id: data.room_id },
     });

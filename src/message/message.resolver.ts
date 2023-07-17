@@ -38,7 +38,7 @@ export class MessageResolver {
   @Permissions('SEND_MESSAGE')
   @Query((returns) => [Message])
   async messages(@Args('data') data: GetMessageInput) {
-    return await this.messageService.findAllByRoom(data.room_id);
+    return await this.messageService.findAllByRoom(data.room_id, data.orderBy);
   }
 
   @UseGuards(AuthGuard)
