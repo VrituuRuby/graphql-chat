@@ -18,6 +18,8 @@ model User {
   createdAt DateTime       @default(now())
   messages  Message[]
   rooms     UsersOnRooms[]
+  friends   User[]         @relation("UserFriends")
+  friendsOf User[]         @relation("UserFriends")
 }
 
 model Room {

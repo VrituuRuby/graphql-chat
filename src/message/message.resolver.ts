@@ -44,11 +44,9 @@ export class MessageResolver {
   @UseGuards(AuthGuard)
   @Subscription((returns) => Message)
   async roomsMessages(@useUser() user_id: number) {
-    console.log('Subscription, user_id:', user_id);
     const userRoomsIds = (await this.roomService.getAllRooms(user_id)).map(
       (room) => `room_${room.id}`,
     );
-    console.log(userRoomsIds);
     return this.pubSub.asyncIterator(userRoomsIds);
   }
 

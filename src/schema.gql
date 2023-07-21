@@ -8,6 +8,7 @@ type User {
   email: String!
   createdAt: DateTime!
   permissions: [String!]
+  friends: [User!]
   rooms: [Room!]!
 }
 
@@ -49,8 +50,8 @@ type AuthDTO {
 
 type Query {
   messages(data: GetMessageInput!): [Message!]!
-  users: [User!]!
   user: User!
+  userByEmail(email: String!): User!
   rooms: [Room!]!
   room(id: Int!): Room!
 }
@@ -63,6 +64,7 @@ input GetMessageInput {
 type Mutation {
   createMessage(data: CreateMessageInput!): Message!
   register(data: CreateUserInput!): User!
+  addFriend(friendId: Int!): User!
   createRoom(data: CreateRoomInput!): Room!
   addUsersToRoom(data: AddUsersToRoomInput!): Room!
   updateUserPermissions(data: UpdateUserPermissionsInput!): UserPermissions!

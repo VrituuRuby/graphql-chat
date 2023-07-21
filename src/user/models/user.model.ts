@@ -1,5 +1,4 @@
-import { Field, HideField, Int, ObjectType } from '@nestjs/graphql';
-import { Room } from 'src/room/model/room.model';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class User {
@@ -17,4 +16,7 @@ export class User {
 
   @Field(() => [String], { nullable: true })
   permissions?: string[];
+
+  @Field(() => [User], { nullable: true })
+  friends?: User[];
 }

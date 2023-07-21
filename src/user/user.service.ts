@@ -19,6 +19,16 @@ export class UserService {
     return userExists;
   }
 
+  async findUserByEmail(email: string) {
+    const userExists = await this.prismaService.user.findUnique({
+      where: { email },
+      include: { friends: true },
+    });
+
+    if (!userExists) throw new NotFoundException('User not found');
+    return userExists;
+  }
+
   async findAllByRoomID(room_id: number) {
     const room = await this.prismaService.room.findUnique({
       where: { id: room_id },
@@ -78,5 +88,22 @@ export class UserService {
     await this.findOneByID(id);
     const deletedUser = await this.prismaService.user.delete({ where: { id } });
     return deletedUser;
+  }
+
+  async addFriend(id: number, friendId: number): Promise<User> {
+    await this.prismaService.user.update({
+      where: { id: friendId },
+      data: {
+        friends: { connect: { id } },
+      },
+    });
+
+    return await this.prismaService.user.update({
+      where: { id },
+      data: { friends: { connect: { id: friendId } } },
+      include: {
+        friends: true,
+      },
+    });
   }
 }

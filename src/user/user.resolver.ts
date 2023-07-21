@@ -10,7 +10,6 @@ import {
 import { UserService } from './user.service';
 import { User } from './models/user.model';
 import { CreateUserInput } from './models/inputs/createUserInput';
-import { MessageService } from 'src/message/message.service';
 import { Room } from 'src/room/model/room.model';
 import { RoomService } from 'src/room/room.service';
 import { UseGuards } from '@nestjs/common';
@@ -25,16 +24,14 @@ export class UsersResolver {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Query((returns) => [User], { name: 'users' })
-  async getAllUsers() {
-    const users = await this.userService.findAll();
-    return users;
+  @Query((returns) => User, { name: 'user' })
+  async getUserByID(@useUser() user_id: number) {
+    return await this.userService.findOneByID(user_id);
   }
 
-  @UseGuards(AuthGuard)
-  @Query((returns) => User, { name: 'user' })
-  async getOneUser(@useUser() user_id: number) {
-    return await this.userService.findOneByID(user_id);
+  @Query((returns) => User, { name: 'userByEmail' })
+  async getUserByEmail(@Args('email', { type: () => String }) email: string) {
+    return await this.userService.findUserByEmail(email);
   }
 
   @Mutation((returns) => User, { name: 'register' })
@@ -45,5 +42,14 @@ export class UsersResolver {
   @ResolveField((returns) => [Room])
   async rooms(@Parent() user: User) {
     return await this.roomService.getAllRooms(user.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation((returns) => User, { name: 'addFriend' })
+  async addFriend(
+    @Args('friendId', { type: () => Int }) friendId: number,
+    @useUser() userId: number,
+  ) {
+    return await this.userService.addFriend(userId, friendId);
   }
 }
