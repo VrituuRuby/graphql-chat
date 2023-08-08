@@ -91,6 +91,9 @@ export class UserService {
   }
 
   async addFriend(id: number, friendId: number): Promise<User> {
+    await this.findOneByID(id);
+    await this.findOneByID(friendId);
+
     await this.prismaService.user.update({
       where: { id: friendId },
       data: {
@@ -98,12 +101,14 @@ export class UserService {
       },
     });
 
-    return await this.prismaService.user.update({
+    const user = await this.prismaService.user.update({
       where: { id },
       data: { friends: { connect: { id: friendId } } },
       include: {
         friends: true,
       },
     });
+
+    return user;
   }
 }

@@ -23,10 +23,11 @@ model User {
 }
 
 model Room {
-  id       Int            @id @default(autoincrement())
-  name     String
-  users    UsersOnRooms[]
-  messages Message[]
+  id        Int            @id @default(autoincrement())
+  name      String?
+  isPrivate Boolean        @default(true)
+  users     UsersOnRooms[]
+  messages  Message[]
 }
 
 model Message {

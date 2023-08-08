@@ -1,7 +1,5 @@
 import {
   Args,
-  Context,
-  Int,
   Mutation,
   Parent,
   Query,

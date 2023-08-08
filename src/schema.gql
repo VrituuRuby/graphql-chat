@@ -19,7 +19,8 @@ scalar DateTime
 
 type Room {
   id: Int!
-  name: String!
+  name: String
+  isPrivate: Boolean!
   users: [User!]!
   messages(orderBy: String!): [Message!]!
   usersPermissions: [UserPermissions!]!

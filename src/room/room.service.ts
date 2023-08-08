@@ -87,6 +87,12 @@ export class RoomService {
         });
       }),
     );
+
+    this.prismaService.room.update({
+      where: { id: room_id },
+      data: { isPrivate: false },
+    });
+
     return await this.getRoom(room_id);
   }
 

@@ -5,6 +5,9 @@ export class Room {
   @Field(() => Int)
   id: number;
 
-  @Field(() => String)
-  name: string;
+  @Field(() => String, { nullable: true })
+  name?: string;
+
+  @Field(() => Boolean, { defaultValue: true })
+  isPrivate: boolean;
 }
