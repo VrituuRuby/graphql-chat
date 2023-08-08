@@ -14,6 +14,9 @@ export class UserService {
   async findOneByID(id: number): Promise<User> {
     const userExists = await this.prismaService.user.findUnique({
       where: { id },
+      include: {
+        friends: true,
+      },
     });
     if (!userExists) throw new NotFoundException('User not found');
     return userExists;
